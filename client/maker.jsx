@@ -9,13 +9,14 @@ const handleDomo = (e, onDomoAdded) => {
 
   const name = e.target.querySelector('#domoName').value;
   const age = e.target.querySelector('#domoAge').value;
+  const level = e.target.querySelector('#domoLevel').value;
 
-  if (!name || !age) {
+  if (!name || !age || !level) {
     helper.handleError('All fields are required');
     return false;
   }
 
-  helper.sendPost(e.target.action, { name, age }, onDomoAdded);
+  helper.sendPost(e.target.action, { name, age, level }, onDomoAdded);
   return false;
 };
 
@@ -32,6 +33,8 @@ const DomoForm = (props) => {
       <input id='domoName' type='text' name='name' placeholder='Domo Name' />
       <label htmlFor='age'>Age: </label>
       <input id='domoAge' type='number' min='0' name='age' />
+      <label htmlFor='level'>Level: </label>
+      <input id='domoLevel' type='number' min='0' name='level' />
       <input className='makeDomoSubmit' type='submit' value='Make Domo' />
     </form>
   );
@@ -57,13 +60,27 @@ const DomoList = (props) => {
     );
   }
 
+  const DomoRemover = async (e) => {
+    const id = e.currentTarget.dataset.id;
+
+    try {
+      return await fetch(`/getDomos/${id}`, {
+        method: 'DELETE',
+      })
+    } catch (err) {
+      console.log(`couldn't delete!`);
+    }
+  }
+
   const domoNodes = domos.map(domo => {
     return (
-      <div key={domo.id} className='domo'>
+      <div key={domo._id} data-id={domo._id} className='domo'>
         <img src='/assets/img/domoface.jpeg' alt='domo face' className='domoFace' />
         <h3 className='domoName'>Name: {domo.name}</h3>
         <h3 className='domoAge'>Age: {domo.age}</h3>
-      </div>
+        <h3 className='domoLevel'>Level: {domo.level}</h3>
+        <button type='button' data-id={domo._id} onClick={DomoRemover} className='deleteButton'>DELETE</button>
+      </div >
     );
   });
 
